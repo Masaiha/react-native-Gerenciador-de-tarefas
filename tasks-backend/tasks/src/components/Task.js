@@ -6,9 +6,6 @@ import commonStyles from '../../commonStyles';
 
 import FormattedDate from '../../functions/FormatterDate'
 
-import moment from 'moment';
-import 'moment/locale/pt-br';
-
 export default props => {
 
     const isDone = props.doneAt != null ? { textDecorationLine: 'line-through' } :false
