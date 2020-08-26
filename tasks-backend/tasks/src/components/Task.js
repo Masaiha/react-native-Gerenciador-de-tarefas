@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 
 import Icon from 'react-native-vector-icons/FontAwesome';
 import commonStyles from '../../commonStyles';
 
-import FormattedDate from '../../functions/FormatterDate'
+import FormattedDate from '../../functions/FormatterDate';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 export default props => {
 

@@ -10,10 +10,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "^3.0.1",
     "moment": "^2.27.0",
     "react": "16.9.0",
     "react-moment": "^0.9.7",
     "react-native": "0.61.5",
+    "react-native-gesture-handler": "^1.7.0",
     "react-native-vector-icons": "^7.0.0"
   },
   "devDependencies": {

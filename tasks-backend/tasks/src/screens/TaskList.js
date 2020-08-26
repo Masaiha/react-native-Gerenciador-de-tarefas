@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text , ImageBackground, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text , ImageBackground, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import commonStyles from '../../commonStyles';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -8,11 +8,13 @@ import Task from '../components/Task';
 import FormatterDate from '../../functions/FormatterDate';
 import { getPlatform } from '../../functions/GettingPlatform';
 import { Platform } from 'react-native';
+import AddTask from './AddTask';
 
 export default class TaskList extends Component {
 
     state = {
         showDonedTasks: true,
+        showAddTaskModal: false,
         visibleTasks: [],
         tasks: [
             {
@@ -69,17 +71,34 @@ export default class TaskList extends Component {
         this.setState({ visibleTasks })
     }
 
+    onSave = (newTask) => {
+
+        if(!newTask.desc || !newTask.desc.trim() || !newTask.data){
+            Alert.alert("Dados incorretos!")
+            return
+        }
+
+        let tasks = [...this.state.tasks];
+        tasks.push({id: Math.random(), desc: newTask.desc, estimateAt: newTask.date, doneAt: null })
+
+        this.setState({ tasks, showAddTaskModal: false }, this.filterTasks)
+    }
+
     render(){
         return(
-
             <View style={styles.container}>
+                <AddTask isVisible={this.state.showAddTaskModal}
+                         onCancel={() => this.setState({ showAddTaskModal: false })}
+                         onSave={this.onSave}
+                />
                 <ImageBackground source={todayImage} style={styles.background}>
                     <View style={styles.iconBar}>
                         <TouchableOpacity onPress={this.toggleFilter}>
                             <Icon name={this.state.showDonedTasks ? 'eye' : 'eye-slash'} 
                                   size={20} 
                                   color={commonStyles.colors.secondary} 
-                                  style={styles.icon}/>
+                                  style={styles.icon}
+                            />
                         </TouchableOpacity>    
                     </View>
                     <View style={styles.titleBar}>
@@ -94,7 +113,11 @@ export default class TaskList extends Component {
                         renderItem={({item}) => <Task {...item} toggleTask={this.toggleTask} /> }
                     />
                 </View>
-
+                <TouchableOpacity style={styles.iconPlus}
+                                  onPress={() => this.setState({ showAddTaskModal: true })}
+                                  activeOpacity={0.7}>
+                    <Icon name="plus" size={20} color={commonStyles.colors.secondary}/>
+                </TouchableOpacity>
             </View>
             
     )}
@@ -109,7 +132,6 @@ const styles = StyleSheet.create({
     },
     taskList:{
         flex: 7,
-        
     },
     titleBar: {
         flex: 1,
@@ -132,8 +154,19 @@ const styles = StyleSheet.create({
     },
     iconBar: {
         flexDirection: 'row',
-        marginHorizontal: 10,
+        marginHorizontal: 20,
         marginVertical: Platform.Os === 'ios' ? 30 : 10,
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+    },
+    iconPlus: {
+        position: "absolute",
+        right: 20,
+        bottom: 20,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: commonStyles.colors.today,
+        justifyContent: 'center',
+        alignItems: 'center'
     }
 })
