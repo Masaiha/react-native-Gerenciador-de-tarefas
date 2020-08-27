@@ -11,19 +11,43 @@ export default props => {
 
     const isDone = props.doneAt != null ? { textDecorationLine: 'line-through' } :false
 
-    return(
-        <View style={styles.container}>
-            <TouchableWithoutFeedback  
-                onPress={() => props.toggleTask(props.id)}>
-                <View style={styles.checkContainer}>
-                    { getCheckView(props.doneAt) }
-                </View>
-            </TouchableWithoutFeedback>
-            <View>
-                <Text style={[styles.desc, isDone]}>{ props.desc }</Text>
-                <FormattedDate style={styles.date} date />
+    const getRightContent = () => {
+        return(
+            <TouchableOpacity style={styles.right} 
+                              onPress={() => props.onDelete && props.onDelete(props.id)}>
+                <Icon name="trash" size={30} color="#FFF" ></Icon>
+            </TouchableOpacity>
+        )
+    }
+
+    const getLeftContent = () => {
+        return(
+            <View style={styles.left}>
+                <Icon name="trash" size={30} color="#FFF" style={styles.excludeIcon}></Icon>
+                <Text style={styles.excludeText}>Excluir</Text>  
             </View>
-        </View>
+        )
+    }
+
+    return(
+        <Swipeable 
+            renderLeftActions={getLeftContent}
+            renderRightActions={getRightContent}
+            onSwipeableLeftOpen={() => props.onDelete && props.onDelete(props.id)}
+        >
+            <View style={styles.container}>
+                <TouchableWithoutFeedback  
+                    onPress={() => props.onToggleTask(props.id)}>
+                    <View style={styles.checkContainer}>
+                        { getCheckView(props.doneAt) }
+                    </View>
+                </TouchableWithoutFeedback>
+                <View>
+                    <Text style={[styles.desc, isDone]}>{ props.desc }</Text>
+                    <FormattedDate style={styles.date} date />
+                </View>
+            </View>
+        </Swipeable>
     )
 }
 
@@ -51,7 +75,8 @@ const styles = StyleSheet.create({
         borderColor: '#AAA',
         borderBottomWidth: 1,
         alignItems: 'center',
-        paddingVertical: 10
+        paddingVertical: 10,
+        backgroundColor: '#FFF'
     },
     checkContainer: {
         width: '20%',
@@ -84,5 +109,27 @@ const styles = StyleSheet.create({
         fontFamily: commonStyles.fontFamily,
         color: commonStyles.colors.subText, 
         fontSize: 12       
+    },
+    right: {
+        backgroundColor: 'red',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        paddingHorizontal: 20
+    },
+    left: {
+        flex: 1,
+        backgroundColor: 'red',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    excludeText: {
+        fontFamily: commonStyles.fontFamily,
+        color: '#FFF',
+        fontSize: 20,
+        margin: 10
+    },
+    excludeIcon: {
+        marginLeft: 10
     }
 })

@@ -9,38 +9,25 @@ import FormatterDate from '../../functions/FormatterDate';
 import { getPlatform } from '../../functions/GettingPlatform';
 import { Platform } from 'react-native';
 import AddTask from './AddTask';
+import AsyncStorage from '@react-native-community/async-storage';
+
+const initialState = {
+    showDonedTasks: true,
+    showAddTaskModal: false,
+    visibleTasks: [],
+    tasks: []
+}
 
 export default class TaskList extends Component {
 
-    state = {
-        showDonedTasks: true,
-        showAddTaskModal: false,
-        visibleTasks: [],
-        tasks: [
-            {
-                id: Math.random(),
-                desc: 'Comprar Livro',
-                estimateAt: new Date(),
-                doneAt: new Date()
-            },
-            {
-                id: Math.random(),
-                desc: 'Ir na feira',
-                estimateAt: new Date(),
-                doneAt: null
-            },
-            {
-                id: Math.random(),
-                desc: 'Ir na feira',
-                estimateAt: new Date(),
-                doneAt: null
-            },
-            
-        ]
-    }
+    state = {...initialState}
 
-    componentDidMount = () => {
-        this.filterTasks()
+    componentDidMount = async () => {
+        const stateString = await AsyncStorage.getItem('tasksState');
+        const state = JSON.parse(stateString) || initialState;
+        
+        this.setState(state, this.filterTasks)
+        // this.filterTasks()
     }
 
     toggleFilter = () => {
@@ -68,12 +55,13 @@ export default class TaskList extends Component {
             visibleTasks = this.state.tasks.filter(pending);
         }
 
-        this.setState({ visibleTasks })
+        this.setState({ visibleTasks });
+        AsyncStorage.setItem('tasksState', JSON.stringify(this.state))
     }
 
     onSave = (newTask) => {
 
-        if(!newTask.desc || !newTask.desc.trim() || !newTask.data){
+        if(!newTask.desc || !newTask.desc.trim()){
             Alert.alert("Dados incorretos!")
             return
         }
@@ -82,6 +70,11 @@ export default class TaskList extends Component {
         tasks.push({id: Math.random(), desc: newTask.desc, estimateAt: newTask.date, doneAt: null })
 
         this.setState({ tasks, showAddTaskModal: false }, this.filterTasks)
+    }
+
+    onDelete = id => {
+        const tasks = this.state.tasks.filter(t => t.id !== id)
+        this.setState({ tasks }, this.filterTasks)
     }
 
     render(){
@@ -110,7 +103,7 @@ export default class TaskList extends Component {
                     <FlatList 
                         data={this.state.visibleTasks} 
                         keyExtractor={item => `${item.id}`}
-                        renderItem={({item}) => <Task {...item} toggleTask={this.toggleTask} /> }
+                        renderItem={({item}) => <Task {...item} onToggleTask={this.toggleTask} onDelete={this.onDelete} /> }
                     />
                 </View>
                 <TouchableOpacity style={styles.iconPlus}
